@@ -4,7 +4,7 @@ class PatientAPITasks(TaskSet):
     def on_start(self):
         self.headers = {
             'Content-Type': 'application/json',
-            'authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjo1LCJ1dWlkIjoiMzQ5NTdkNzAtZGU0Zi00MzVjLWJkZDQtMTZhYTgxMTBlZDc2IiwiaWF0IjoxNzIzNTU2Mzk0LCJleHAiOjE3MjM1NTY2OTR9.olxcVNWcMHqY-gbjqCsYU0koXjEPZCSa0I2fDPwtl-c',
+            'authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjo1LCJ1dWlkIjoiZjQyM2NhY2MtNTE0Ni00YTMyLWE1MGYtMjIyMTkxNDBkZTg2IiwiaWF0IjoxNzIzNjE2NTk1LCJleHAiOjE3MjM2MTY4OTV9.6JLjk0M6hBjgh-GqY0ArjpQR2E5mFWmn0HXTys7M9hQ',
             'accept': 'application/json, text/plain, */*',
             'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
