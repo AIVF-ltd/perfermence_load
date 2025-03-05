@@ -1,39 +1,101 @@
 import json
+import random
 from locust import HttpUser, TaskSet, task, between
+
 
 class PatientAPITasks(TaskSet):
     def on_start(self):
+        """Executed when a user starts a test session."""
+        self.access_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Inh2TTRPUzNhalRJNXFteVEtVGQzZCJ9.eyJwYXRpZW50X3VzZXJfcGsiOjYsImlzcyI6Imh0dHBzOi8vZW1hLWRldmVsb3BtZW50LmV1LmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NzBmNjJmM2I5MzhjMDBhMzgyNjYyYTQiLCJhdWQiOlsiaHR0cHM6Ly9saXJhbi10ZXN0ZXIuY29tIiwiaHR0cHM6Ly9lbWEtZGV2ZWxvcG1lbnQuZXUuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTc0MTA4NTgxNSwiZXhwIjoxNzQxMTcyMjE1LCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIiwib3JnX2lkIjoib3JnX3hDNHlKYmdoQ1RKSkZIY2YiLCJvcmdfbmFtZSI6ImFpdmYiLCJhenAiOiJ4SEVpb29PWWF4b0RNbjRMRFVHekhQdFBiVldQOTRWcyJ9.gKAmkaUVgoC39bK8zC_Sq5TK7eX7xKbdA1FNPDmFkKgATbfAGQNiwZpIABxClLZ-m-lIj6Iw7D1MmgX7gyUcI33vx3pDcewxU2rna72SrdBYOsg1Ggx79IXJz-N2htX2rptHZTTOb9-eixD9nQk45oEPWJnvILXCLie1_lJoa4aUYavKB174EBwO1pl5bTKmyV5FmpMN12b30FtF9nxn_fPjibPRAsYMNk_2RiM-0DkT_B8WnOLprbCRZhHG7FOaeVfsJO4J2zTXm7gOVU7oIObL1k893EJCSPHXi4ZnTkS50f4eXnPz7Lw4McsdicO1pZAQsq_sZ0b0gJhfMtwWSw"  # Replace with a valid token
+        if not self.access_token:
+            raise ValueError("❌ ERROR: ACCESS_TOKEN is not set!")
+
         self.headers = {
-            'Content-Type': 'application/json',
-            # 'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlVfd1lzTFFYT1VkaDBKSldWOTZaRiJ9.eyJhaXZmL3JvbGVzIjpbIkxhYiBEaXJlY3RvciJdLCJmdWxsTmFtZSI6IlJ1c2xhbiBnIiwib3JnYW5pemF0aW9uIjp7ImRpc3BsYXlfbmFtZSI6IkFJVkYiLCJpZCI6Im9yZ19FaTdndmo5Z2V2OWlMZWtvIiwibWV0YWRhdGEiOnsiYmlsbGluZ19sYXVuY2hfZGF0ZSI6IjIwMjMuMTAuMDEiLCJ0ZW5hbnRfaWQiOiIxMDAiLCJ0aW1lem9uZSI6IkFzaWEvSmVydXNhbGVtIn0sIm5hbWUiOiJhaXZmLWRldiJ9LCJpc3MiOiJodHRwczovL2F1dGguc3RhdGljLmFpdmYtZGV2LmF1dG9tYXQtaXQuaW8vIiwic3ViIjoiYXV0aDB8NjU5YTlkYjQwMWUzZjZjNzZlMjJiOTk2IiwiYXVkIjpbImFpdmYiLCJodHRwczovL2Rldi10aTV2anZwbTF2ZHQ4OHlrLmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3MjY2NTY0MzMsImV4cCI6MTcyNjc0MjgzMywic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsIm9yZ19pZCI6Im9yZ19FaTdndmo5Z2V2OWlMZWtvIiwib3JnX25hbWUiOiJhaXZmLWRldiIsImF6cCI6IjBSWHlPWFJPTVE3NHVjTEF4bGZrc1YyQ1hsb3pHUTlGIiwicGVybWlzc2lvbnMiOlsidXNlcnM6aW52aXRlIiwidXNlcnM6cmVhZCIsInVzZXJzOnVwZGF0ZSJdfQ.fbC2ejtCNi-t9WFeU6wZDCtP9jWzdtFLEgcmhG3KB-AELsTLlSSokmfoTd2u5NpG1L-yVxZkcMyPbWu4xVJFKz1O1l77Aa82lZzj4Vr6oY32Hho8wYOGeaBES5-qPmUAWHlf4IaOcU8NSqnjFFxq5t6tL0Lqp4wzn-gLtu75x87MRhAkEGP3fIRd4a9ftDcvxtUhHuW2PpW3dhT3IRf-YKi1VWInHL7E75nrsIpOOVhpp5JmtEcExI0O-mkwjjt5yCaWB9xPfoX1TokX6i05v_cLxKBvKW4e3yJooGAaKcp3K6sDdS4Tuq0dwNLRui875Fo8BO1K9g6Pjgyx1yroJA',
-            # 'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlVfd1lzTFFYT1VkaDBKSldWOTZaRiJ9.eyJhaXZmL3JvbGVzIjpbIkxhYiBEaXJlY3RvciJdLCJmdWxsTmFtZSI6IlJ1c2xhbiBnIiwib3JnYW5pemF0aW9uIjp7ImRpc3BsYXlfbmFtZSI6IkFJVkYiLCJpZCI6Im9yZ19FaTdndmo5Z2V2OWlMZWtvIiwibWV0YWRhdGEiOnsiYmlsbGluZ19sYXVuY2hfZGF0ZSI6IjIwMjMuMTAuMDEiLCJ0ZW5hbnRfaWQiOiIxMDAiLCJ0aW1lem9uZSI6IkFzaWEvSmVydXNhbGVtIn0sIm5hbWUiOiJhaXZmLWRldiJ9LCJpc3MiOiJodHRwczovL2F1dGguc3RhdGljLmFpdmYtZGV2LmF1dG9tYXQtaXQuaW8vIiwic3ViIjoiYXV0aDB8NjU5YTlkYjQwMWUzZjZjNzZlMjJiOTk2IiwiYXVkIjpbImFpdmYiLCJodHRwczovL2Rldi10aTV2anZwbTF2ZHQ4OHlrLmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3MzE4MzQzMjMsImV4cCI6MTczMTkyMDcyMywic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsIm9yZ19pZCI6Im9yZ19FaTdndmo5Z2V2OWlMZWtvIiwib3JnX25hbWUiOiJhaXZmLWRldiIsImF6cCI6IjBSWHlPWFJPTVE3NHVjTEF4bGZrc1YyQ1hsb3pHUTlGIiwicGVybWlzc2lvbnMiOlsidXNlcnM6aW52aXRlIiwidXNlcnM6cmVhZCIsInVzZXJzOnVwZGF0ZSJdfQ.XQd04evCRMyhoM8-KHiDbdOUT9T-IOvlD4XPJuV7TYUo0aHJ7qnSEi7fIbwt06AW1C3IsqYTr_zQH0LfkckuQWs3vm9p2-0uGhjayWurAffScxXYoPt2JT-Igx6lL--=',
-            'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlVfd1lzTFFYT1VkaDBKSldWOTZaRiJ9.eyJhaXZmL3JvbGVzIjpbIkxhYiBEaXJlY3RvciJdLCJmdWxsTmFtZSI6IlJ1c2xhbiBnIiwib3JnYW5pemF0aW9uIjp7ImRpc3BsYXlfbmFtZSI6InFhLWNsaW5pYy0xIiwiaWQiOiJvcmdfeWdqcWhxVm9JZFRhd1UySSIsIm1ldGFkYXRhIjp7InRlbmFudF9pZCI6IjIwMCIsInRpbWV6b25lIjoiQXNpYS9KZXJ1c2FsZW0ifSwibmFtZSI6ImFpdmYtcWEtY2xpbmljLTEifSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnN0YXRpYy5haXZmLWRldi5hdXRvbWF0LWl0LmlvLyIsInN1YiI6ImF1dGgwfDY1OWE5ZGI0MDFlM2Y2Yzc2ZTIyYjk5NiIsImF1ZCI6WyJhaXZmIiwiaHR0cHM6Ly9kZXYtdGk1dmp2cG0xdmR0ODh5ay5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzM4NzU2MTgxLCJleHAiOjE3Mzg4NDI1ODEsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJvcmdfaWQiOiJvcmdfeWdqcWhxVm9JZFRhd1UySSIsIm9yZ19uYW1lIjoiYWl2Zi1xYS1jbGluaWMtMSIsImF6cCI6Im5UV1pZbTREbnpONkY0elM0UVM4NlgwaHZYQzJoWWZnIiwicGVybWlzc2lvbnMiOlsidXNlcnM6aW52aXRlIiwidXNlcnM6cmVhZCIsInVzZXJzOnVwZGF0ZSJdfQ.IJ7CWe-PfRRNItXAT3VcyeUFuUbgNPXdPRcY1HtieRAlj6_NZfxUESN_uOLCVQV0_eD-6dkIKuqU8AtM1ivk9DvHs8YxHfD2Iqm4knBhsunOGGmW9ioez7gTTfphu2W-UrKEcoPSyzmM2Bzf47elKLCwwsvcBOZ67Q8R4anMl9jEtFMIIal9xBY8jObhHGTShVRqhmeaQ38iAHfuFh7mRujrUn_5XHN4p_Enu0BGD0i-GhkUE6_wr2mQq4g9YXYt_B1kFtfJnaRLtn2x2el6Pn37LSC42jFxuMQGa9mibnRmIvBpSARn00M0kX4yor0xAVGo22h2V6gSFTM-4895hQ',
-            'accept': 'application/json, text/plain, */*',
-            'accept-encoding': 'gzip, deflate, br, zstd',
-            'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
-            'connection': 'keep-alive',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': f'Bearer {self.access_token}',
+            'tzOffsetInMinutes': '120',
         }
 
-    @task
-    def get_patients(self):
-        # url = "/api/v1/ema-server/patients?treatment_status=active&page=1&limit=30&sort=day&order=asc"
-        url = "/api/v1/ema-server/notifications?type=received"
-        #/api/v1/ema-server/patients?treatment_status=active&page=1&limit=30&sort=day&order=asc
+        self.chat_id = None  # Store chat ID dynamically
+        self.tenant_id = "100"  # Replace if necessary
 
+    @task(2)
+    def get_chats(self):
+        """Fetches the list of patient chats."""
+        url = "/api/v1/patient/messaging/chats"
+        response = self.client.get(url, headers=self.headers)
+        data = self.process_response(response)
+
+        if data and "content" in data and len(data["content"]) > 0:
+            self.chat_id = data["content"][0]["chatId"]
+            print(f"💬 Using chatId: {self.chat_id}")
+
+    @task(1)
+    def create_chat(self):
+        """Creates a new chat with a random topic."""
+        url = "/api/v1/patient/messaging/chats"
+        topic_id = random.randint(0, 4)  # Select a random topic
+
+        payload = {
+            "tenantId": self.tenant_id,  # Tenant ID is now included
+            "topicId": topic_id,
+            "initialMessage": {"messageContent": "Hello, this is a test message."}
+        }
+
+        response = self.client.post(url, headers=self.headers, json=payload)
+        data = self.process_response(response)
+
+        if data and "chatId" in data:
+            self.chat_id = data["chatId"]
+            print(f"✅ New chat created: chatId={self.chat_id}")
+
+    @task(3)
+    def get_chat_messages(self):
+        """Fetches messages from an existing chat."""
+        if not self.chat_id:
+            print("⚠️ Skipping get_chat_messages: No chatId found!")
+            return
+
+        url = f"/api/v1/patient/messaging/chats/{self.chat_id}/messages?limit=10&offset=0"
         response = self.client.get(url, headers=self.headers)
         self.process_response(response)
 
+    # @task(3)
+    # def send_message(self):
+    #     """Sends a message to an existing chat."""
+    #     if not self.chat_id:
+    #         print("⚠️ Skipping send_message: No chatId found!")
+    #         return
+    #
+    #     url = f"/api/v1/patient/messaging/chats/{self.chat_id}/messages"
+    #     payload = {"messageContent": "This is a test message from Locust!"}
+    #
+    #     response = self.client.post(url, headers=self.headers, json=payload)
+    #     self.process_response(response)
+
     def process_response(self, response):
-        print("Request URL:", response.request.url)
-        print("Response Status Code:", response.status_code)
-        print("Response Headers:", response.headers)
+        """Handles API responses and logs output."""
+        print(f"🔗 Request URL: {response.request.url}")
+        print(f"📡 Status: {response.status_code} | Time: {response.elapsed.total_seconds()} sec")
+
+        if response.status_code == 401:
+            print("❌ ERROR: Unauthorized (401). Check your access token!")
+            return None
+        elif response.status_code == 400:
+            print(f"❌ ERROR: Bad Request (400) - {response.text}")
+            return None
+
         try:
             data = response.json()
-            print("Response JSON Data:", data)
+            print(f"✅ Response JSON: {json.dumps(data, indent=2)}")
+            return data
         except ValueError:
-            print("Response Text:", response.text)
+            print(f"⚠️ Non-JSON Response: {response.text}")
+            return None
+
 
 class WebsiteUser(HttpUser):
+    """Locust user configuration."""
     tasks = [PatientAPITasks]
     wait_time = between(1, 5)
-    host = "https://static.aivf-dev.automat-it.io"
+    host = "https://1dc684udt4.execute-api.eu-central-1.amazonaws.com/dev/bfm"
